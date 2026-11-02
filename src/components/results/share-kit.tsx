@@ -47,29 +47,54 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
   };
 
   /**
-   * Opens the Snapchat "send to friends" flow, like the web version does:
-   *  - Android: an intent straight to the Snapchat app with the message and link (falls back to the
-   *    Snapchat camera link if the app is missing or an in-app browser blocks intents).
-   *  - iPhone: the system share sheet (Snapchat is listed there), or the camera link as a fallback.
-   *  - Desktop: Snapchat for Web share page.
+   * Snapchat does not accept plain text/links from other apps into a chat; it only opens the
+   * "Send to" (friends) screen for a PHOTO or video. So on phones we share the quiz image as a file
+   * through the system share sheet: user taps Snapchat, the photo lands on Send to, they pick
+   * friends and send. The link is copied to the clipboard so it can be pasted as a caption or
+   * attached with Snapchat's link (paperclip) tool.
+   * Fallbacks: Android intent with the text (app opens, user pastes), camera link, web share page.
    */
-  const snapchat = () => {
+  const snapchat = async () => {
     log("snapchat");
     const ua = navigator.userAgent;
     const android = /Android/i.test(ua);
-    const ios = /iPhone|iPad|iPod/i.test(ua);
+    const mobile = android || /iPhone|iPad|iPod/i.test(ua);
     const full = `${text}\n${url}`;
-    void navigator.clipboard?.writeText(full).catch(() => {});
+    try {
+      await navigator.clipboard?.writeText(full);
+    } catch {
+      /* clipboard blocked: the share/caption still works */
+    }
     setSnapHint(true);
+
+    if (!mobile) {
+      window.open(snapchatUrl(url, false), "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (storyImageUrl && "share" in navigator) {
+      setBusy(true);
+      try {
+        prefetchStory();
+        const blob = await storyBlob.current!;
+        const file = new File([blob], "who-knows-me.png", { type: "image/png" });
+        if (navigator.canShare?.({ files: [file] })) {
+          // text is ignored by Snapchat but used by other apps if the user picks them instead
+          await navigator.share({ files: [file], text: full });
+          return;
+        }
+      } catch (e) {
+        if ((e as DOMException)?.name === "AbortError") return; // user closed the share sheet
+      } finally {
+        setBusy(false);
+      }
+    }
+
     if (android) {
       const fallback = encodeURIComponent(snapchatUrl(url, true));
-      window.location.href = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;package=com.snapchat.android;S.android.intent.extra.TEXT=${encodeURIComponent(full)};S.browser_fallback_url=${fallback};end`;
-    } else if (ios && "share" in navigator) {
-      navigator.share({ text, url }).catch(() => {});
-    } else if (ios) {
-      window.location.href = snapchatUrl(url, true);
+      window.location.assign(`intent:#Intent;action=android.intent.action.SEND;type=text/plain;package=com.snapchat.android;S.android.intent.extra.TEXT=${encodeURIComponent(full)};S.browser_fallback_url=${fallback};end`);
     } else {
-      window.open(snapchatUrl(url, false), "_blank", "noopener,noreferrer");
+      window.location.assign(snapchatUrl(url, true));
     }
   };
 
@@ -147,13 +172,18 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
 
   return (
     <div className={cn("space-y-3", className)}>
-      <Button variant="snapchat" size="xl" className="w-full" onClick={snapchat}>
+      <Button variant="snapchat" size="xl" className="w-full" onClick={snapchat} onPointerDown={prefetchStory} disabled={busy}>
         <Ghost className="size-6" aria-hidden /> Snapchat pe bhejo
       </Button>
       {snapHint && (
-        <p className="rounded-xl bg-muted p-3 text-sm" role="status">
-          Snapchat khul raha hai. Dost chuno aur bhej do. Message aur link copy bhi ho gaya hai, zaroorat ho to paste kar sakte ho.
-        </p>
+        <div className="rounded-xl bg-muted p-3 text-sm" role="status">
+          <p className="font-bold">Share list mein Snapchat chuno 👻</p>
+          <ol className="mt-1 list-decimal pl-5 text-muted-foreground">
+            <li>Quiz ki photo Snapchat ke &quot;Send to&quot; pe aa jayegi.</li>
+            <li>Link copy ho gaya hai. Caption mein paste karo, ya 📎 (paperclip) se link lagao.</li>
+            <li>Dost chuno aur Send dabao.</li>
+          </ol>
+        </div>
       )}
 
       <div className={cn("grid gap-2", compact ? "grid-cols-3" : "grid-cols-2")}>
