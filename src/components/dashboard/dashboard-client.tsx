@@ -31,11 +31,16 @@ export function RememberDevice(p: Props) {
   const [saved, setSaved] = useState(true);
   const [copied, setCopied] = useState(false);
   useEffect(() => {
-    const known = getMyQuizzes().some((q) => q.slug === p.slug);
-    if (!known) saveMyQuiz({ slug: p.slug, token: p.token, title: p.title, avatar: p.avatar, createdAt: p.createdAt });
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- device-local check after hydration
-    setSaved(known);
+    let alive = true;
+    void getMyQuizzes().then(async (list) => {
+      const known = list.some((q) => q.slug === p.slug);
+      if (!known) await saveMyQuiz({ slug: p.slug, token: p.token, title: p.title, avatar: p.avatar, createdAt: p.createdAt });
+      if (alive) setSaved(known);
+    });
     track("dashboard_opened", { slug: p.slug });
+    return () => {
+      alive = false;
+    };
   }, [p.slug, p.token, p.title, p.avatar, p.createdAt]);
 
   const copy = async () => {
@@ -78,7 +83,7 @@ export function DangerZone({ token, slug, expiresAt }: { token: string; slug: st
     setBusy(null);
     if (!res?.ok) return setError(data?.error || "Something went wrong.");
     if (action === "delete") {
-      removeMyQuiz(slug);
+      await removeMyQuiz(slug);
       router.replace("/me?deleted=1");
     } else {
       router.refresh();

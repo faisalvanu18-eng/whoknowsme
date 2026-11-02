@@ -13,9 +13,15 @@ export function MyQuizzes({ compact = false }: { compact?: boolean }) {
   const [played, setPlayed] = useState<PlayedQuiz[]>([]);
 
   useEffect(() => {
+    let alive = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after hydration
-    setMine(getMyQuizzes());
     setPlayed(getPlayed());
+    void getMyQuizzes().then((list) => {
+      if (alive) setMine(list);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   if (mine === null) return compact ? null : <div className="h-40" aria-busy="true" />;

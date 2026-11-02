@@ -175,12 +175,12 @@ Ads are **OFF** until you set `NEXT_PUBLIC_ADS_ENABLED=true`. While off, no ad c
 5. Set `NEXT_PUBLIC_ADS_ENABLED=true` and redeploy (Vercel only applies new variables on a new deploy).
 
 **How it is built (and why)**
-- Each slot is a sandboxed `<iframe src="/ad-frame?kind=banner">` (`sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"`). Adsterra's script therefore cannot read the page, cannot redirect it (no top-navigation), and the main site keeps its strict CSP. `/ad-frame` has its own permissive CSP because Adsterra uses many rotating domains.
-- Only **Banner** and **Native Banner** are used. **Popunder, Social Bar and Direct Link are intentionally not used**: they open tabs or overlay the page, and would also be blocked by the sandbox.
+- Each slot is an `<iframe src="/ad-frame?kind=banner">`. `/ad-frame` has its own permissive CSP (Adsterra uses many rotating domains), so the main site keeps its strict CSP.
+- Adsterra's banner only renders with `allow-same-origin` (verified: without it the slot is blank). Since `/ad-frame` is on our own origin, the ad script is **not** isolated from the site. Mitigations: the private dashboard tokens ("My quizzes on this device") are stored in an httpOnly cookie via `/api/mine` (scripts cannot read it; old localStorage entries are migrated automatically), and ads never run on `/quiz`, `/create`, `/dashboard`, `/me` or `/admin`. For full isolation, serve `/ad-frame` from a separate domain.
+- Only **Banner** and **Native Banner** are used. **Popunder, Social Bar and Direct Link are intentionally not used**: they open tabs or overlay the page.
 - Max 3 per page: home (2), articles (after paragraph 2, after paragraph 5, end), result page (1, below score, share buttons and answer review), content pages (1). Never on `/quiz`, `/create`, `/dashboard`, `/admin`, `/me`, `/offline`.
 - Every slot reserves its height (no layout shift), is labelled "Advertisement", loads lazily near the viewport, and renders only after the visitor accepts cookies in regions that require consent.
 - All positions live in `src/config/ads.ts`.
-- Honest note: ads in a sandboxed frame can occasionally earn a little less than ads injected into the page (some bidders want same-origin access). If revenue looks low, test it, but do not remove the sandbox without understanding the risk.
 - Adsterra approval and payouts are decided by Adsterra; nothing in code can guarantee them.
 
 **Google AdSense (optional later):** set `NEXT_PUBLIC_AD_PROVIDER=adsense`, fill `NEXT_PUBLIC_ADSENSE_CLIENT` and the `NEXT_PUBLIC_AD_SLOT_*` ids, turn Auto ads OFF in AdSense, and use Google's CMP for EEA/UK/CH (`NEXT_PUBLIC_GOOGLE_CMP_ENABLED=true`). Note that AdSense and Adsterra should not be shown on the same page.

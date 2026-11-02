@@ -125,8 +125,12 @@ export default function PrivacyPage() {
             <code>wkr_…</code> (cookie, 7 days): lets you, and only you, see the answer review for your attempt.
           </li>
           <li>
-            Local storage: your theme, cookie choices, &quot;My quizzes on this device&quot; (including your private dashboard links), quizzes you played,
-            and the nickname you last used. This never leaves your device unless you submit a quiz.
+            <code>wk_mine</code> (httpOnly cookie, up to 400 days): &quot;My quizzes on this device&quot;, i.e. your private dashboard links. It is only
+            sent to our <code>/api/mine</code> endpoint and cannot be read by scripts on the page.
+          </li>
+          <li>
+            Local storage: your theme, cookie choices, quizzes you played, and the nickname you last used. This never leaves your device unless you
+            submit a quiz.
           </li>
         </ul>
         <p>With your consent (or unless you opt out, depending on your region), third parties may also set cookies:</p>
@@ -148,7 +152,7 @@ export default function PrivacyPage() {
 
         <h2>6. Advertising</h2>
         <p>
-          We show ads from Adsterra (and, in future, possibly Google AdSense) on some content pages and below quiz results, never inside a quiz. Adsterra ads are shown in a separate, sandboxed frame and may use cookies to measure and personalise ads. Third-party vendors, including Google, use
+          We show ads from Adsterra (and, in future, possibly Google AdSense) on some content pages and below quiz results, never inside a quiz. Adsterra ads are shown in a separate frame and may use cookies and similar technologies to measure and personalise ads. Third-party vendors, including Google, use
           cookies to serve ads based on your prior visits to this and other websites. Google&apos;s use of advertising cookies enables it and its partners
           to serve ads based on your visits to this site and/or other sites on the internet.
         </p>

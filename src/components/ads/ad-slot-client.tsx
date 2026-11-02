@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
  *  - lazy: the ad is only created when the slot is near the viewport
  *  - generous margins so it never sits next to buttons
  *  - collapses if consent is missing where it is required
- *  - Adsterra runs inside a sandboxed iframe (see /ad-frame): no DOM access, no page redirects
+ *  - Adsterra runs inside its own iframe (/ad-frame), not directly in our page markup
  */
 export function AdSlotClient({ placement, className }: { placement: Placement; className?: string }) {
   const cfg = PLACEMENTS[placement];
@@ -74,9 +74,11 @@ export function AdSlotClient({ placement, className }: { placement: Placement; c
             src={`/ad-frame?kind=${adsterraKind}`}
             loading="lazy"
             scrolling="no"
-            // No allow-same-origin (ad code can't reach our page) and no allow-top-navigation (ad code
-            // can't redirect the page). Clicks may still open the advertiser in a new tab.
-            sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
+            // Adsterra's banner script needs same-origin access to render (tested: without it the slot
+            // stays blank). Because /ad-frame is on our own origin, this means the ad script is NOT
+            // isolated from our site. That is why secrets (dashboard tokens) are kept in an httpOnly
+            // cookie (/api/mine) instead of localStorage, and ads never run on quiz/create/dashboard pages.
+            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
             referrerPolicy="strict-origin-when-cross-origin"
             style={{
               border: 0,

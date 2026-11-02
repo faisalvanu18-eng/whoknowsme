@@ -501,7 +501,7 @@ function ProfileStep({
     } catch {
       /* ignore */
     }
-    saveMyQuiz({ slug: data.slug, token: data.token, title: v.title, avatar, createdAt: new Date().toISOString() });
+    await saveMyQuiz({ slug: data.slug, token: data.token, title: v.title, avatar, createdAt: new Date().toISOString() });
     track("quiz_published", { dim: String(drafts.length), slug: data.slug });
     haptic([15, 40, 15]);
     onPublished({ ...data, nickname: v.nickname, size: drafts.length, title: v.title, avatar });

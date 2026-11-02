@@ -5,9 +5,11 @@
  *
  * Ad provider: Adsterra (default) or Google AdSense (NEXT_PUBLIC_AD_PROVIDER=adsense).
  *
- * Adsterra ads are NOT injected into our pages. Each slot is a sandboxed <iframe> that loads
- * /ad-frame, a separate page with its own CSP. That means Adsterra's scripts cannot touch our DOM,
- * cannot redirect the page (no top navigation), and our main site keeps its strict CSP.
+ * Adsterra ads are not written into our page markup. Each slot is an <iframe> that loads /ad-frame,
+ * a separate page with its own CSP, so our main pages keep a strict CSP. Note: Adsterra's script
+ * only renders with allow-same-origin, so it is NOT fully isolated from our origin. Mitigations:
+ * no secrets in localStorage (dashboard tokens live in an httpOnly cookie), and no ads on
+ * /quiz, /create, /dashboard, /me, /admin.
  *
  * Ads render only when ALL of these are true:
  *   1. NEXT_PUBLIC_ADS_ENABLED === "true"
