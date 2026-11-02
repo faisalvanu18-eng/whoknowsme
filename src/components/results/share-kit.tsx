@@ -46,15 +46,31 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
     window.open(channelUrl(channel, text, url), "_blank", "noopener,noreferrer");
   };
 
-  /** Opens Snapchat directly (app on phones, web share sheet on desktop). */
+  /**
+   * Opens the Snapchat "send to friends" flow, like the web version does:
+   *  - Android: an intent straight to the Snapchat app with the message and link (falls back to the
+   *    Snapchat camera link if the app is missing or an in-app browser blocks intents).
+   *  - iPhone: the system share sheet (Snapchat is listed there), or the camera link as a fallback.
+   *  - Desktop: Snapchat for Web share page.
+   */
   const snapchat = () => {
     log("snapchat");
-    const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    // Snapchat cannot prefill text, so put the message on the clipboard to paste as a caption.
-    void navigator.clipboard?.writeText(`${text}\n${url}`).catch(() => {});
+    const ua = navigator.userAgent;
+    const android = /Android/i.test(ua);
+    const ios = /iPhone|iPad|iPod/i.test(ua);
+    const full = `${text}\n${url}`;
+    void navigator.clipboard?.writeText(full).catch(() => {});
     setSnapHint(true);
-    if (mobile) window.location.href = snapchatUrl(url, true);
-    else window.open(snapchatUrl(url, false), "_blank", "noopener,noreferrer");
+    if (android) {
+      const fallback = encodeURIComponent(snapchatUrl(url, true));
+      window.location.href = `intent:#Intent;action=android.intent.action.SEND;type=text/plain;package=com.snapchat.android;S.android.intent.extra.TEXT=${encodeURIComponent(full)};S.browser_fallback_url=${fallback};end`;
+    } else if (ios && "share" in navigator) {
+      navigator.share({ text, url }).catch(() => {});
+    } else if (ios) {
+      window.location.href = snapchatUrl(url, true);
+    } else {
+      window.open(snapchatUrl(url, false), "_blank", "noopener,noreferrer");
+    }
   };
 
   const copy = async () => {
@@ -136,7 +152,7 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
       </Button>
       {snapHint && (
         <p className="rounded-xl bg-muted p-3 text-sm" role="status">
-          Snapchat khul raha hai. Link snap pe lag jayega, aur message copy ho gaya hai (caption mein paste kar sakte ho).
+          Snapchat khul raha hai. Dost chuno aur bhej do. Message aur link copy bhi ho gaya hai, zaroorat ho to paste kar sakte ho.
         </p>
       )}
 

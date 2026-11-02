@@ -27,8 +27,9 @@ export function resultShareText(opts: { creator: string; score: number; total: n
 
 /**
  * Snapchat share link.
- *  - Phones: snapchat.com/scan?attachmentUrl= is a universal link that opens the Snapchat app on the
- *    camera with the quiz link already attached to the snap.
+ *  - Phones (fallback only): snapchat.com/scan?attachmentUrl= opens the Snapchat app on the camera
+ *    with the quiz link attached to the snap. The share button prefers an Android intent or the iOS
+ *    share sheet so the "send to friends" screen opens, like the web version.
  *  - Desktop: the official Snapchat for Web share sheet (snapchat.com/share?link=).
  * (Snapchat has no official way to prefill caption text, so the share text is copied to the clipboard.)
  */
