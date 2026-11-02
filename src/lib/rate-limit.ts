@@ -12,10 +12,12 @@ import { sha256Hex } from "@/lib/security/tokens";
 type Rule = { limit: number; window: `${number} ${"s" | "m" | "h" | "d"}` };
 
 export const RULES = {
-  createQuiz: { limit: 5, window: "1 h" },
-  createQuizBurst: { limit: 2, window: "1 m" },
-  attemptPerQuiz: { limit: 6, window: "1 h" }, // retakes allowed, but not spam
-  attemptGlobal: { limit: 60, window: "1 h" },
+  // Limits are per IP. Many Indian users share one IP (mobile carrier NAT, college/hostel WiFi),
+  // so these are deliberately generous; Turnstile + validation handle bots.
+  createQuiz: { limit: 30, window: "1 h" },
+  createQuizBurst: { limit: 8, window: "1 m" },
+  attemptPerQuiz: { limit: 120, window: "1 h" }, // retakes allowed; friends on one WiFi can all play
+  attemptGlobal: { limit: 400, window: "1 h" },
   report: { limit: 5, window: "1 h" },
   track: { limit: 240, window: "1 m" },
   dashboard: { limit: 60, window: "1 m" },

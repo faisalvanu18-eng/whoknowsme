@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     rateLimit("attemptGlobal", ip),
   ]);
   if (!perQuiz.success || !global.success) {
-    return jsonError(429, "Whoa, lots of retakes! Give it a little while before trying again.", {
+    return jsonError(429, "Bahut zyada retakes! Thodi der baad phir try karo.", {
       retryAfter: retryAfterSeconds(perQuiz.success ? global.reset : perQuiz.reset),
     });
   }

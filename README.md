@@ -121,8 +121,8 @@ Create a free Redis database and set `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_R
 
 | Rule | Limit |
 |---|---|
-| Create quiz | 2/min and 5/hour per IP |
-| Submit attempt | 6/hour per IP per quiz, 60/hour per IP |
+| Create quiz | 8/min and 30/hour per IP |
+| Submit attempt | 120/hour per IP per quiz, 400/hour per IP |
 | Report | 5/hour per IP |
 | Track | 240/min per IP |
 | Admin login | 5 per 15 min per IP |

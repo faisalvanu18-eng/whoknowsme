@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   const [burst, hourly] = await Promise.all([rateLimit("createQuizBurst", ip), rateLimit("createQuiz", ip)]);
   if (!burst.success || !hourly.success) {
     const reset = Math.max(burst.success ? 0 : burst.reset, hourly.success ? 0 : hourly.reset);
-    return jsonError(429, "You're making quizzes really fast! Take a short break and try again.", {
+    return jsonError(429, "Bahut jaldi jaldi quiz ban rahe hain! Thodi der ruko aur phir try karo.", {
       retryAfter: retryAfterSeconds(reset),
     });
   }
