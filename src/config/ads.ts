@@ -30,7 +30,9 @@ export const MAX_ADS_PER_PAGE = 3;
 export const ADSTERRA = {
   /** Banner 300x250 key (32 hex chars) from Adsterra > Websites > Get code. */
   bannerKey: process.env.NEXT_PUBLIC_ADSTERRA_BANNER_KEY || "",
-  /** Host in the banner's invoke.js URL (Adsterra rotates these; copy it from the code they give you). */
+  /** Full banner script URL from the code Adsterra gives you, e.g. https://bicea.org/22/<key>. Preferred. */
+  bannerSrc: process.env.NEXT_PUBLIC_ADSTERRA_BANNER_SRC || "",
+  /** Legacy form: host of a  https://HOST/<key>/invoke.js  script (only used when bannerSrc is empty). */
   bannerHost: process.env.NEXT_PUBLIC_ADSTERRA_BANNER_HOST || "www.highperformanceformat.com",
   bannerHeight: 250,
   bannerWidth: 300,

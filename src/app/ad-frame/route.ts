@@ -14,6 +14,8 @@ export const dynamic = "force-dynamic";
  * Keys/hosts come from server env and are strictly validated before being written into HTML.
  */
 const KEY_RE = /^[A-Za-z0-9]{16,64}$/;
+// Path of the ad script URL, e.g. /22/<key> or /<key>/invoke.js
+const PATH_RE = /^\/[A-Za-z0-9/_.-]{1,200}$/;
 const HOST_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i;
 
 function page(body: string) {
@@ -24,9 +26,22 @@ export function GET(req: Request) {
   const kind = new URL(req.url).searchParams.get("kind");
   let html = "";
 
-  if (kind === "banner" && KEY_RE.test(ADSTERRA.bannerKey) && HOST_RE.test(ADSTERRA.bannerHost)) {
-    const opts = JSON.stringify({ key: ADSTERRA.bannerKey, format: "iframe", height: ADSTERRA.bannerHeight, width: ADSTERRA.bannerWidth, params: {} });
-    html = page(`<script>atOptions = ${opts};</script><script src="https://${ADSTERRA.bannerHost}/${ADSTERRA.bannerKey}/invoke.js"></script>`);
+  if (kind === "banner" && KEY_RE.test(ADSTERRA.bannerKey)) {
+    let src = "";
+    if (ADSTERRA.bannerSrc) {
+      try {
+        const u = new URL(ADSTERRA.bannerSrc);
+        if (u.protocol === "https:" && HOST_RE.test(u.hostname) && PATH_RE.test(u.pathname)) src = `${u.origin}${u.pathname}`;
+      } catch {
+        /* invalid env: render nothing */
+      }
+    } else if (HOST_RE.test(ADSTERRA.bannerHost)) {
+      src = `https://${ADSTERRA.bannerHost}/${ADSTERRA.bannerKey}/invoke.js`;
+    }
+    if (src) {
+      const opts = JSON.stringify({ key: ADSTERRA.bannerKey, format: "iframe", height: ADSTERRA.bannerHeight, width: ADSTERRA.bannerWidth, params: {} });
+      html = page(`<script>atOptions = ${opts};</script><script src="${src}"></script>`);
+    }
   } else if (kind === "native") {
     try {
       const u = new URL(ADSTERRA.nativeSrc);

@@ -169,7 +169,7 @@ Ads are **OFF** until you set `NEXT_PUBLIC_ADS_ENABLED=true`. While off, no ad c
 
 **Adsterra setup**
 1. In Adsterra: *Websites → Add website* with your live domain, and wait for the site to be approved.
-2. *Get code → Banner 300x250*. From the code they show, copy the **key** (32 chars) and the **host** in `//HOST/KEY/invoke.js` into `NEXT_PUBLIC_ADSTERRA_BANNER_KEY` and `NEXT_PUBLIC_ADSTERRA_BANNER_HOST`.
+2. *Get code → Banner 300x250*. From the code they show, copy the **key** (32 chars, inside `atOptions`) into `NEXT_PUBLIC_ADSTERRA_BANNER_KEY`, and the full `<script src="...">` URL (e.g. `https://bicea.org/22/<key>`) into `NEXT_PUBLIC_ADSTERRA_BANNER_SRC`.
 3. Optional: *Native Banner* → paste the full script URL into `NEXT_PUBLIC_ADSTERRA_NATIVE_SRC` (used for the 2nd in-article slot; falls back to a banner without it).
 4. Adsterra *Websites → your site → ads.txt*: paste the line(s) into `ADS_TXT_LINES` (separate several with `;`). Check `https://YOUR_DOMAIN/ads.txt`.
 5. Set `NEXT_PUBLIC_ADS_ENABLED=true` and redeploy (Vercel only applies new variables on a new deploy).
