@@ -210,7 +210,7 @@ export const articles1: Article[] = [
       { type: "h2", text: "Step 4: Save your dashboard link" },
       { type: "p", text: "When you publish, you get two links. The share link is for friends. The dashboard link is private and shows scores. Because there are no accounts, this link is the only way to see results from another device. Bookmark it, copy it to your notes, or send it to yourself. The app also remembers it on the device you used." },
       { type: "h2", text: "Step 5: Share it everywhere" },
-      { type: "p", text: "The Share Kit gives you one-tap buttons for WhatsApp, Telegram and copying the link, a ready-made image for your Instagram story, and a QR code for showing friends in person. Each share includes a playful line like \"Bet you can't score 10/10 on me\" that you can edit." },
+      { type: "p", text: "The Share Kit gives you one-tap buttons for Snapchat, Telegram and copying the link, a ready-made image for your Instagram story, and a QR code for showing friends in person. Each share includes a playful line like \"Bet you can't score 10/10 on me\" that you can edit." },
       { type: "ul", items: [
         "Group chats get the most plays because everyone sees each other's scores roll in.",
         "Instagram stories reach people you would not message directly.",

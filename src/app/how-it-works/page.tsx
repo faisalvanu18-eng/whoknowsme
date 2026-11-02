@@ -33,7 +33,7 @@ export default function HowItWorksPage() {
             <strong>Add a nickname and avatar.</strong> No real name needed. Pick an animal avatar so friends recognise your quiz in their chats.
           </li>
           <li>
-            <strong>Publish and share.</strong> Send the link to WhatsApp or Telegram, post the ready-made image to your Instagram Story, or show a QR code.
+            <strong>Publish and share.</strong> Send the link on Snapchat or Telegram, post the ready-made image to your Instagram Story, or show a QR code.
           </li>
           <li>
             <strong>Save your private results link.</strong> This is your key to the leaderboard. There are no accounts, so we can&apos;t recover it for you.

@@ -84,7 +84,7 @@ export const reportSchema = z.object({
 });
 export type ReportInput = z.infer<typeof reportSchema>;
 
-export const SHARE_CHANNELS = ["whatsapp", "instagram", "telegram", "copy", "qr", "native", "x", "messenger", "other"] as const;
+export const SHARE_CHANNELS = ["snapchat", "whatsapp", "instagram", "telegram", "copy", "qr", "native", "x", "messenger", "other"] as const;
 export type ShareChannel = (typeof SHARE_CHANNELS)[number];
 
 /** Events the first-party counter endpoint accepts. Everything else is GA-only. */

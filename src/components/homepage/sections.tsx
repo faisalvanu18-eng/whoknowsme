@@ -26,7 +26,7 @@ export function TemplateChips() {
 export function HowSteps() {
   const steps = [
     { n: "1", title: "Tap your answers", text: "Pick a template and tap what's true for you. Swap any question or write your own." },
-    { n: "2", title: "Share your link", text: "One tap to WhatsApp, Telegram, Instagram Story or a QR code. Friends don't need an account." },
+    { n: "2", title: "Share your link", text: "One tap to Snapchat, Telegram, Instagram Story or a QR code. Friends don't need an account." },
     { n: "3", title: "See who knows you", text: "Friends get a score and a fun title. You get a private leaderboard of everyone who played." },
   ];
   return (

@@ -20,6 +20,7 @@ export const buttonVariants = cva(
         ghost: "text-foreground hover:bg-muted",
         dangerGhost: "text-danger hover:bg-danger/10",
         whatsapp: "bg-[#25D366] text-[#073B1C] shadow-lg shadow-[#25D366]/25 hover:brightness-105",
+        snapchat: "bg-[#FFFC00] text-black shadow-lg shadow-[#FFFC00]/30 hover:brightness-95",
         danger: "bg-danger text-white hover:brightness-110",
       },
       size: {

@@ -25,9 +25,24 @@ export function resultShareText(opts: { creator: string; score: number; total: n
   return `Maine ${opts.creator} ke quiz mein ${opts.score}/${opts.total} score kiya: "${opts.tier}" ${opts.score === opts.total ? "🏆" : ""}\n${opts.grid}\nTumhe lagta hai tum ${opts.creator} ko mujhse zyada jaante ho? 👇`;
 }
 
+/**
+ * Snapchat share link.
+ *  - Phones: snapchat.com/scan?attachmentUrl= is a universal link that opens the Snapchat app on the
+ *    camera with the quiz link already attached to the snap.
+ *  - Desktop: the official Snapchat for Web share sheet (snapchat.com/share?link=).
+ * (Snapchat has no official way to prefill caption text, so the share text is copied to the clipboard.)
+ */
+export function snapchatUrl(url: string, mobile: boolean) {
+  return mobile
+    ? `https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(url)}`
+    : `https://www.snapchat.com/share?link=${encodeURIComponent(url)}`;
+}
+
 export function channelUrl(channel: ShareChannel, text: string, url: string) {
   const full = `${text}\n${url}`;
   switch (channel) {
+    case "snapchat":
+      return snapchatUrl(url, false);
     case "whatsapp":
       return `https://wa.me/?text=${encodeURIComponent(full)}`;
     case "telegram":

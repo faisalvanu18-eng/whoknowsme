@@ -52,7 +52,7 @@ export default function PrivacyPage() {
         </ul>
         <h3>Aggregate statistics</h3>
         <p>
-          We keep daily totals, such as &quot;quizzes created&quot;, &quot;quizzes completed&quot; or &quot;shares via WhatsApp&quot;. These are counters only;
+          We keep daily totals, such as &quot;quizzes created&quot;, &quot;quizzes completed&quot; or &quot;shares via Snapchat&quot;. These are counters only;
           they contain no identifiers and cannot be linked to you. Anonymous referral codes in links (<code>?ref=</code>) identify a quiz or result, not a
           person.
         </p>
