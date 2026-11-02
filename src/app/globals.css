@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f4f1ff;
+  --foreground: #1c1838;
+  --card: #ffffff;
+  --card-foreground: #1c1838;
+  --muted: #ebe6ff;
+  --muted-foreground: #5b5677;
+  --primary: #7047eb;
+  --primary-foreground: #ffffff;
+  /* primary used as TEXT colour (AA on light backgrounds: 4.9:1 on #F4F1FF) */
+  --primary-text: #7047eb;
+  --blue: #3984f7;
+  --accent: #e3dcff;
+  --border: #ddd5fb;
+  --ring: #7047eb;
+  --success: #16a34a;
+  --danger: #e11d48;
+  --radius: 1rem;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #171525;
+  --foreground: #f1eefe;
+  --card: #211e35;
+  --card-foreground: #f1eefe;
+  --muted: #2a2643;
+  --muted-foreground: #aaa4c7;
+  /* same fill as light mode so white button text keeps 5.5:1 contrast */
+  --primary: #7047eb;
+  --primary-foreground: #ffffff;
+  /* lighter for text on dark surfaces (7.8:1 on #171525) */
+  --primary-text: #b39dfb;
+  --blue: #5b9bf9;
+  --accent: #2f2a4c;
+  --border: #35304f;
+  --ring: #8b6cf2;
+  --success: #22c55e;
+  --danger: #fb7185;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-blue: var(--blue);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+
+  --animate-pop-in: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-fade-up: fade-up 0.4s ease-out both;
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+  }
+  button, [role="button"], a {
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  .pb-safe { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .bg-brand-gradient { background-image: linear-gradient(135deg, #7047eb 0%, #3984f7 100%); }
+  .text-brand-gradient {
+    background-image: linear-gradient(135deg, #7047eb 0%, #3984f7 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dark .text-brand-gradient { background-image: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%); }
+  .skeleton {
+    background: linear-gradient(90deg, var(--muted) 25%, var(--accent) 50%, var(--muted) 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+}
+
+/* Article typography (blog/guides, legal pages) without the typography plugin */
+.prose-content { line-height: 1.75; font-size: 1.0625rem; }
+.prose-content h2 { font-size: 1.5rem; font-weight: 800; margin: 2.25rem 0 0.75rem; line-height: 1.25; }
+.prose-content h3 { font-size: 1.2rem; font-weight: 700; margin: 1.75rem 0 0.5rem; }
+.prose-content p { margin: 0 0 1.1rem; }
+.prose-content ul, .prose-content ol { margin: 0 0 1.25rem; padding-left: 1.4rem; }
+.prose-content ul { list-style: disc; }
+.prose-content ol { list-style: decimal; }
+.prose-content li { margin: 0.35rem 0; }
+.prose-content a { color: var(--primary-text); text-decoration: underline; text-underline-offset: 3px; }
+.prose-content strong { font-weight: 700; }
+.prose-content table { width: 100%; border-collapse: collapse; margin: 0 0 1.25rem; font-size: 0.95rem; }
+.prose-content th, .prose-content td { border: 1px solid var(--border); padding: 0.5rem 0.65rem; text-align: left; vertical-align: top; }
+
+/* Dark mode: text-primary needs a lighter tint than the button fill to stay readable. */
+.dark .text-primary { color: var(--primary-text); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
