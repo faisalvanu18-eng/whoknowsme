@@ -12,9 +12,12 @@ type CardProps = {
   score?: { score: number; total: number; tier: string; friend?: string | null };
   size?: number;
   variant: "og" | "story";
+  /** Story only: QR code (data URI) + readable link, because Snapchat drops text sent with a photo. */
+  qr?: string;
+  link?: string;
 };
 
-export function ShareCard({ avatar, nickname, title, score, size, variant }: CardProps) {
+export function ShareCard({ avatar, nickname, title, score, size, variant, qr, link }: CardProps) {
   const story = variant === "story";
   const s = story ? 1.6 : 1;
   return (
@@ -88,12 +91,20 @@ export function ShareCard({ avatar, nickname, title, score, size, variant }: Car
             fontWeight: 800,
           }}
         >
-          {score ? "Think you can beat that?" : "Tap to take the quiz"}
+          {score ? "Think you can beat that?" : story && qr ? "Neeche QR scan karo" : "Tap to take the quiz"}
         </div>
       </div>
       <div style={{ display: "flex", marginTop: 30 * s, fontSize: 30 * s, fontWeight: 800, opacity: 0.95 }}>Who Knows You Better?</div>
-      {story && (
-        <div style={{ display: "flex", marginTop: 20, fontSize: 36, opacity: 0.85 }}>Link in my story sticker</div>
+      {story && qr && (
+        <div style={{ display: "flex", alignItems: "center", marginTop: 36, background: "#FFFFFF", color: "#1C1838", borderRadius: 40, padding: "28px 36px", gap: 32 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={qr} width={260} height={260} alt="" />
+          <div style={{ display: "flex", flexDirection: "column", maxWidth: 520 }}>
+            <div style={{ display: "flex", fontSize: 40, fontWeight: 900, color: "#7047EB" }}>Scan karke khelo</div>
+            <div style={{ display: "flex", marginTop: 12, fontSize: 30, fontWeight: 600, color: "#5B5677" }}>Snapchat camera se scan karo, ya ye link kholo:</div>
+            <div style={{ display: "flex", marginTop: 14, fontSize: 34, fontWeight: 800, wordBreak: "break-all" }}>{link}</div>
+          </div>
+        </div>
       )}
     </div>
   );
