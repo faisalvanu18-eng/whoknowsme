@@ -91,7 +91,10 @@ export function DangerZone({ token, slug, expiresAt }: { token: string; slug: st
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm">
           <Timer className="mr-1 inline size-4" aria-hidden />
-          {expiresAt ? `Auto-deletes on ${new Date(expiresAt).toLocaleDateString()}` : "Stays until you delete it"}
+          {expiresAt
+            ? // Fixed locale + time zone so the server render and the phone show the same text (no hydration error).
+              `Auto-deletes on ${new Date(expiresAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" })}`
+            : "Stays until you delete it"}
         </p>
         <Button size="sm" variant="secondary" disabled={!!busy} onClick={() => act(expiresAt ? "clear_expiry" : "set_expiry")}>
           {busy === "set_expiry" || busy === "clear_expiry" ? <Loader2 className="animate-spin" aria-hidden /> : null}

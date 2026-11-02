@@ -33,7 +33,7 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
   const [copied, setCopied] = useState(false);
   const [qr, setQr] = useState<string | null>(null);
   const [storyHelp, setStoryHelp] = useState(false);
-  const [snapHint, setSnapHint] = useState(false);
+  const [snapCopied, setSnapCopied] = useState<"ok" | "failed" | null>(null);
   const [busy, setBusy] = useState(false);
 
   const log = (channel: ShareChannel) => {
@@ -46,74 +46,70 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
     window.open(channelUrl(channel, text, url), "_blank", "noopener,noreferrer");
   };
 
-  /**
-   * Snapchat does not accept plain text/links from other apps into a chat; it only opens the
-   * "Send to" (friends) screen for a PHOTO or video. So on phones we share the quiz image as a file
-   * through the system share sheet: user taps Snapchat, the photo lands on Send to, they pick
-   * friends and send. The link is copied to the clipboard so it can be pasted as a caption or
-   * attached with Snapchat's link (paperclip) tool.
-   * Fallbacks: Android intent with the text (app opens, user pastes), camera link, web share page.
-   */
-  const snapchat = async () => {
-    log("snapchat");
-    const ua = navigator.userAgent;
-    const android = /Android/i.test(ua);
-    const mobile = android || /iPhone|iPad|iPod/i.test(ua);
-    const full = `${text}\n${url}`;
+  /** Clipboard write with a fallback for in-app browsers without the async clipboard API. */
+  const writeClipboard = async (value: string) => {
     try {
-      await navigator.clipboard?.writeText(full);
+      await navigator.clipboard.writeText(value);
+      return true;
     } catch {
-      /* clipboard blocked: the share/caption still works */
-    }
-    setSnapHint(true);
-
-    if (!mobile) {
-      window.open(snapchatUrl(url, false), "_blank", "noopener,noreferrer");
-      return;
-    }
-
-    if (storyImageUrl && "share" in navigator) {
-      setBusy(true);
       try {
-        prefetchStory();
-        const blob = await storyBlob.current!;
-        const file = new File([blob], "who-knows-me.png", { type: "image/png" });
-        if (navigator.canShare?.({ files: [file] })) {
-          // text is ignored by Snapchat but used by other apps if the user picks them instead
-          await navigator.share({ files: [file], text: full });
-          return;
-        }
-      } catch (e) {
-        if ((e as DOMException)?.name === "AbortError") return; // user closed the share sheet
-      } finally {
-        setBusy(false);
+        const ta = document.createElement("textarea");
+        ta.value = value;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand("copy");
+        ta.remove();
+        return ok;
+      } catch {
+        return false;
       }
     }
+  };
 
-    if (android) {
-      const fallback = encodeURIComponent(snapchatUrl(url, true));
-      window.location.assign(`intent:#Intent;action=android.intent.action.SEND;type=text/plain;package=com.snapchat.android;S.android.intent.extra.TEXT=${encodeURIComponent(full)};S.browser_fallback_url=${fallback};end`);
+  /**
+   * Snapchat step 1: copy the message + link. Snapchat does not let any app or website drop a
+   * text/link message into a chat, so the user pastes it themselves (step 2 opens the app).
+   */
+  const snapCopy = async () => {
+    log("snapchat");
+    const ok = await writeClipboard(`${text}\n${url}`);
+    setSnapCopied(ok ? "ok" : "failed");
+  };
+
+  /** Snapchat step 2: open the app (or Snapchat for Web on desktop, which can send the link itself). */
+  const snapOpen = () => {
+    haptic();
+    const ua = navigator.userAgent;
+    if (/Android/i.test(ua)) {
+      window.location.assign(`intent://#Intent;scheme=snapchat;package=com.snapchat.android;S.browser_fallback_url=${encodeURIComponent("https://www.snapchat.com/")};end`);
+    } else if (/iPhone|iPad|iPod/i.test(ua)) {
+      window.location.assign("snapchat://");
     } else {
-      window.location.assign(snapchatUrl(url, true));
+      window.open(snapchatUrl(url, false), "_blank", "noopener,noreferrer");
+    }
+  };
+
+  /** Optional: send the quiz photo (QR + link inside) via the share sheet -> Snapchat "Send to". */
+  const snapPhoto = async () => {
+    if (!storyImageUrl || !("share" in navigator)) return;
+    setBusy(true);
+    try {
+      prefetchStory();
+      const blob = await storyBlob.current!;
+      const file = new File([blob], "who-knows-me.png", { type: "image/png" });
+      if (navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text: `${text}\n${url}` });
+    } catch {
+      /* cancelled or unsupported */
+    } finally {
+      setBusy(false);
     }
   };
 
   const copy = async () => {
     log("copy");
-    const full = `${text}\n${url}`;
-    try {
-      await navigator.clipboard.writeText(full);
-    } catch {
-      // In-app browsers without clipboard API
-      const ta = document.createElement("textarea");
-      ta.value = full;
-      ta.style.position = "fixed";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-    }
+    await writeClipboard(`${text}\n${url}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -172,17 +168,40 @@ export function ShareKit({ url, text, kind, slug, storyImageUrl, className, comp
 
   return (
     <div className={cn("space-y-3", className)}>
-      <Button variant="snapchat" size="xl" className="w-full" onClick={snapchat} onPointerDown={prefetchStory} disabled={busy}>
-        <Ghost className="size-6" aria-hidden /> Snapchat pe bhejo
-      </Button>
-      {snapHint && (
-        <div className="rounded-xl bg-muted p-3 text-sm" role="status">
-          <p className="font-bold">Share list mein Snapchat chuno 👻</p>
-          <ol className="mt-1 list-decimal pl-5 text-muted-foreground">
-            <li>Quiz ki photo Snapchat ke &quot;Send to&quot; pe aa jayegi.</li>
-            <li>Link copy ho gaya hai. Caption mein paste karo, ya 📎 (paperclip) se link lagao.</li>
-            <li>Dost chuno aur Send dabao.</li>
+      {snapCopied === null ? (
+        <Button variant="snapchat" size="xl" className="w-full" onClick={snapCopy} onPointerDown={prefetchStory}>
+          <Ghost className="size-6" aria-hidden /> Snapchat pe bhejo
+        </Button>
+      ) : (
+        <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-[#FFFC00] bg-[#FFFC00]/10 p-4" role="status">
+          {snapCopied === "ok" ? (
+            <p className="flex items-center gap-2 font-extrabold">
+              <Check className="size-5 text-success" aria-hidden /> Link copy ho gaya!
+            </p>
+          ) : (
+            <div>
+              <p className="font-extrabold">Copy nahi hua. Ye link khud copy karo:</p>
+              <p className="mt-1 select-all break-all rounded-lg bg-card p-2 text-sm">{url}</p>
+            </div>
+          )}
+          <Button variant="snapchat" size="xl" className="w-full" onClick={snapOpen}>
+            <Ghost className="size-6" aria-hidden /> Snapchat kholo
+          </Button>
+          <ol className="list-decimal space-y-0.5 pl-5 text-sm text-muted-foreground">
+            <li>Snapchat mein dost ki chat kholo.</li>
+            <li>Message box pe long-press karke <b>Paste</b> karo.</li>
+            <li>Send dabao. Ho gaya! 🎉</li>
           </ol>
+          <div className="flex flex-wrap gap-x-4 text-sm">
+            <button type="button" onClick={snapCopy} className="min-h-11 font-semibold text-primary underline">
+              Link dobara copy karo
+            </button>
+            {storyImageUrl && (
+              <button type="button" onClick={snapPhoto} disabled={busy} className="min-h-11 font-semibold text-primary underline">
+                Photo ke saath bhejo
+              </button>
+            )}
+          </div>
         </div>
       )}
 
