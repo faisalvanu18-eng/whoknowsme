@@ -148,7 +148,7 @@ export default function PrivacyPage() {
 
         <h2>6. Advertising</h2>
         <p>
-          We show ads from Google AdSense on some content pages and below quiz results, never inside a quiz. Third-party vendors, including Google, use
+          We show ads from Adsterra (and, in future, possibly Google AdSense) on some content pages and below quiz results, never inside a quiz. Adsterra ads are shown in a separate, sandboxed frame and may use cookies to measure and personalise ads. Third-party vendors, including Google, use
           cookies to serve ads based on your prior visits to this and other websites. Google&apos;s use of advertising cookies enables it and its partners
           to serve ads based on your visits to this site and/or other sites on the internet.
         </p>
@@ -177,7 +177,8 @@ export default function PrivacyPage() {
           <li>Supabase Inc. (database)</li>
           <li>Upstash Inc. (rate limiting, hashed keys only)</li>
           <li>Cloudflare Inc. (bot protection)</li>
-          <li>Google LLC (analytics and advertising, as described above)</li>
+          <li>Adsterra (advertising, shown on content pages)</li>
+          <li>Google LLC (analytics, and advertising if AdSense is enabled)</li>
         </ul>
         <p>
           Some of these providers process data outside your country, including in the United States. Where required, transfers rely on appropriate

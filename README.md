@@ -163,33 +163,29 @@ Custom events sent: `page_view`, `quiz_create_started`, `quiz_published`, `share
 2. Submit `https://YOUR_DOMAIN/sitemap.xml`.
 3. Check *Pages*: `/quiz/*`, `/result/*`, `/dashboard/*` are intentionally excluded (noindex or disallowed).
 
-### 8. AdSense (keep ads OFF until approved)
+### 8. Ads (Adsterra by default; AdSense optional)
 
-Honest note: **no code can guarantee AdSense approval.** This build follows the published program policies as closely as possible to give you the best chance.
+Ads are **OFF** until you set `NEXT_PUBLIC_ADS_ENABLED=true`. While off, no ad code ships at all.
 
-Checklist before applying:
+**Adsterra setup**
+1. In Adsterra: *Websites → Add website* with your live domain, and wait for the site to be approved.
+2. *Get code → Banner 300x250*. From the code they show, copy the **key** (32 chars) and the **host** in `//HOST/KEY/invoke.js` into `NEXT_PUBLIC_ADSTERRA_BANNER_KEY` and `NEXT_PUBLIC_ADSTERRA_BANNER_HOST`.
+3. Optional: *Native Banner* → paste the full script URL into `NEXT_PUBLIC_ADSTERRA_NATIVE_SRC` (used for the 2nd in-article slot; falls back to a banner without it).
+4. Adsterra *Websites → your site → ads.txt*: paste the line(s) into `ADS_TXT_LINES` (separate several with `;`). Check `https://YOUR_DOMAIN/ads.txt`.
+5. Set `NEXT_PUBLIC_ADS_ENABLED=true` and redeploy (Vercel only applies new variables on a new deploy).
 
-- [ ] Custom domain live with HTTPS, `NEXT_PUBLIC_SITE_URL` set.
-- [ ] Replace `[Operator name]`, address and `[jurisdiction]` in `/privacy` and `/terms`, and have them reviewed.
-- [ ] Set `NEXT_PUBLIC_CONTACT_EMAIL` to a real inbox.
-- [ ] Consider adding a few more articles of your own over the first weeks. Fresh, original content helps.
-- [ ] Set `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-…` and verify `https://YOUR_DOMAIN/ads.txt` shows your line.
-- [ ] Apply in AdSense. Keep `NEXT_PUBLIC_ADS_ENABLED=false` during review.
-- [ ] In AdSense → **Privacy & messaging**, create a **GDPR** message (Google's certified CMP), then set `NEXT_PUBLIC_GOOGLE_CMP_ENABLED=true`. EEA/UK/CH visitors then get Google's CMP; everyone else gets the built-in banner.
-- [ ] In AdSense → Ads → **turn Auto ads OFF**. They create anchor/vignette overlays that this layout is designed to avoid.
-- [ ] After approval: create one Display ad unit per placement, put the IDs in `NEXT_PUBLIC_AD_SLOT_*`, set `NEXT_PUBLIC_ADS_ENABLED=true`, and redeploy.
+**How it is built (and why)**
+- Each slot is a sandboxed `<iframe src="/ad-frame?kind=banner">` (`sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"`). Adsterra's script therefore cannot read the page, cannot redirect it (no top-navigation), and the main site keeps its strict CSP. `/ad-frame` has its own permissive CSP because Adsterra uses many rotating domains.
+- Only **Banner** and **Native Banner** are used. **Popunder, Social Bar and Direct Link are intentionally not used**: they open tabs or overlay the page, and would also be blocked by the sandbox.
+- Max 3 per page: home (2), articles (after paragraph 2, after paragraph 5, end), result page (1, below score, share buttons and answer review), content pages (1). Never on `/quiz`, `/create`, `/dashboard`, `/admin`, `/me`, `/offline`.
+- Every slot reserves its height (no layout shift), is labelled "Advertisement", loads lazily near the viewport, and renders only after the visitor accepts cookies in regions that require consent.
+- All positions live in `src/config/ads.ts`.
+- Honest note: ads in a sandboxed frame can occasionally earn a little less than ads injected into the page (some bidders want same-origin access). If revenue looks low, test it, but do not remove the sandbox without understanding the risk.
+- Adsterra approval and payouts are decided by Adsterra; nothing in code can guarantee them.
 
-How ads are constrained (enforced in code, not just convention):
-
-- `src/config/ads.ts` is the single file for placements. Edit `PLACEMENTS` to move/disable slots for A/B tests.
-- `<AdSlot/>` is a server gate: while the flag is off, **no ad JavaScript ships at all**.
-- Never on `/quiz`, `/create`, `/dashboard`, `/admin`, `/me`, `/offline` (`NO_AD_ROUTES`), and the AdSense script is never injected there.
-- Max 3 per page: home (2), articles (after paragraph 2, after paragraph 5, end), result page (1, below score, share buttons and answer review), content pages (1).
-- Every slot reserves its height (no CLS), is labelled "Advertisement", lazy-loads near the viewport, and has 48px margins away from buttons.
-- Ads load only after consent in EEA/UK/CH. Users can choose non-personalised ads (`ad_personalization` denied + `requestNonPersonalizedAds`).
+**Google AdSense (optional later):** set `NEXT_PUBLIC_AD_PROVIDER=adsense`, fill `NEXT_PUBLIC_ADSENSE_CLIENT` and the `NEXT_PUBLIC_AD_SLOT_*` ids, turn Auto ads OFF in AdSense, and use Google's CMP for EEA/UK/CH (`NEXT_PUBLIC_GOOGLE_CMP_ENABLED=true`). Note that AdSense and Adsterra should not be shown on the same page.
 
 ---
-
 ## How the important parts work
 
 ### Scoring and secrecy

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ADSENSE_CLIENT, NO_AD_ROUTES, adsGloballyOn } from "@/config/ads";
+import { ADSENSE_CLIENT, AD_PROVIDER, NO_AD_ROUTES, adsGloballyOn } from "@/config/ads";
 import { CONSENT_EVENT, adsAllowed, isConsentRegion, readConsent } from "@/lib/consent";
 
-const GOOGLE_CMP = process.env.NEXT_PUBLIC_GOOGLE_CMP_ENABLED === "true";
+// Google's CMP only covers Google ads, so it is ignored for Adsterra (our own banner handles consent).
+const GOOGLE_CMP = AD_PROVIDER === "adsense" && process.env.NEXT_PUBLIC_GOOGLE_CMP_ENABLED === "true";
 export const ADS_READY_EVENT = "wk:ads-ready";
 
 declare global {
@@ -38,7 +39,8 @@ export function AdsLoader() {
   }, []);
 
   useEffect(() => {
-    if (window.__wkAdsLoaded || !canShowAds(pathname)) return;
+    // Adsterra needs no global script: its banners live in sandboxed iframes (see /ad-frame).
+    if (AD_PROVIDER !== "adsense" || window.__wkAdsLoaded || !canShowAds(pathname)) return;
     const c = readConsent();
     window.adsbygoogle = window.adsbygoogle || ([] as unknown as NonNullable<Window["adsbygoogle"]>);
     if (c && !c.personalized) window.adsbygoogle.requestNonPersonalizedAds = 1;

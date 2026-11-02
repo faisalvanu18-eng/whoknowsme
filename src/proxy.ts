@@ -28,6 +28,6 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // pages only: skip API, static assets, images, OG images, icons, PWA files
-    "/((?!api|_next/static|_next/image|_vercel|favicon.ico|icon|apple-icon|pwa-icon|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|ads.txt|.*opengraph-image.*|.*\\.(?:png|jpg|jpeg|svg|webp|avif|ico|txt|xml|js|css|woff2?)$).*)",
+    "/((?!api|ad-frame|_next/static|_next/image|_vercel|favicon.ico|icon|apple-icon|pwa-icon|sw.js|manifest.webmanifest|robots.txt|sitemap.xml|ads.txt|.*opengraph-image.*|.*\\.(?:png|jpg|jpeg|svg|webp|avif|ico|txt|xml|js|css|woff2?)$).*)",
   ],
 };

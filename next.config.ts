@@ -48,6 +48,7 @@ const csp = [
   ].join(" "),
   [
     "frame-src",
+    "'self'", // our own sandboxed /ad-frame
     "https://*.doubleclick.net",
     "https://*.googlesyndication.com",
     "https://*.adtrafficquality.google",
@@ -88,7 +89,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/:path*", headers: securityHeaders },
+      // /ad-frame sets its own (permissive, sandboxed) policy in its route handler.
+      { source: "/((?!ad-frame).*)", headers: securityHeaders },
       {
         // Creator dashboards carry a secret in the URL: never leak it via Referer, never index.
         source: "/dashboard/:path*",

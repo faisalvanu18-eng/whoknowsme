@@ -7,9 +7,9 @@ import { Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OPEN_CONSENT_EVENT } from "@/components/analytics/cookie-settings-link";
 import { isConsentRegion, readConsent, writeConsent } from "@/lib/consent";
-import { NO_AD_ROUTES } from "@/config/ads";
+import { AD_PROVIDER, NO_AD_ROUTES } from "@/config/ads";
 
-const GOOGLE_CMP = process.env.NEXT_PUBLIC_GOOGLE_CMP_ENABLED === "true";
+const GOOGLE_CMP = AD_PROVIDER === "adsense" && process.env.NEXT_PUBLIC_GOOGLE_CMP_ENABLED === "true";
 
 /**
  * Built-in consent UI driving Consent Mode v2.
