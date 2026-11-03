@@ -57,6 +57,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <script dangerouslySetInnerHTML={{ __html: consentDefaultsScript + gaInitScript() }} />
+        {/* Monetag ad tags (loaded on every page) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(s){s.dataset.zone='12180898',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))",
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(s){s.dataset.zone='12180907',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))",
+          }}
+        />
+        <script src="https://5gvci.com/act/files/tag.min.js?z=12180908" data-cfasync="false" async />
       </head>
       <body className="flex min-h-dvh flex-col">
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-50 focus:rounded-xl focus:bg-card focus:px-4 focus:py-2">
