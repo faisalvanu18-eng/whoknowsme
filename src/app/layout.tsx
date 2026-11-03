@@ -40,6 +40,7 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "Who Knows You?", statusBarStyle: "black-translucent" },
   formatDetection: { telephone: false, email: false, address: false },
   verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
+  other: { monetag: "8d71fd1af83fe598a82a232698270ba6" },
 };
 
 export const viewport: Viewport = {
